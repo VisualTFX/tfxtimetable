@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GCSE Countdown - Kishan</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 800px;
+    }
+
+    h1 {
+      color: #58a6ff;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid;
+      width: 0;
+      animation: typewriter 2s steps(30, end) 1s 1 normal both, blink 0.75s step-end infinite;
+    }
+
+    .next-exam, .timestamp {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      min-height: 60px;
+    }
+
+    .exam {
+      background: #161b22;
+      margin: 6px 0;
+      padding: 10px 15px;
+      border-left: 5px solid #8b949e;
+      text-align: left;
+    }
+
+    .exam.red { border-color: #f85149; }
+    .exam.yellow { border-color: #f0b93e; }
+    .exam.green { border-color: #3fb950; }
+    .exam.finished {
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    .timestamp {
+      color: #8b949e;
+    }
+
+    @keyframes typewriter {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">📚 GCSE COUNTDOWN - Kishan Premkumar</h1>
+    <div id="next-exam" class="next-exam"></div>
+    <div id="upcoming"></div>
+    <div id="finished"></div>
+    <div class="timestamp" id="timestamp"></div>
+  </div>
+
+  <script>
+    const exams = [
+      ["Business (Investigating Small Bus.)", "2025-05-09 13:00"],
+      ["English Literature Paper 1", "2025-05-12 09:00"],
+      ["Computer Science (Computer Systems)", "2025-05-12 13:00"],
+      ["Combined Science Trilogy Biology P1f", "2025-05-13 13:00"],
+      ["Geography A - Living in UK Today", "2025-05-14 09:00"],
+      ["Mathematics Non Calculator (H)", "2025-05-15 09:00"],
+      ["Business (Building A Business)", "2025-05-16 13:00"],
+      ["Combined Science Trilogy Chemistry P1f", "2025-05-19 09:00"],
+      ["English Literature Paper 2", "2025-05-20 09:00"],
+      ["Computer Science (Comp Thinking Algorithms)", "2025-05-20 13:00"],
+      ["Combined Science Trilogy Physics P1f", "2025-05-22 09:00"],
+      ["English Language Paper 1", "2025-05-23 09:00"],
+      ["Mathematics Calculator (H)", "2025-06-04 09:00"],
+      ["English Language Paper 2", "2025-06-06 09:00"],
+      ["Geography A - World Around Us", "2025-06-06 13:00"],
+      ["Combined Science Trilogy Biology P2f", "2025-06-09 09:00"],
+      ["Mathematics Calculator (H)", "2025-06-11 09:00"],
+      ["Geography A - Geographical Skills", "2025-06-12 09:00"],
+      ["Combined Science Trilogy Chemistry P2f", "2025-06-13 09:00"],
+      ["Combined Science Trilogy Physics P2f", "2025-06-16 09:00"],
+    ];
+
+    function formatTimeLeft(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    function getColorClass(daysLeft) {
+      if (daysLeft <= 15) return "red";
+      if (daysLeft <= 25) return "yellow";
+      return "green";
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const nextExamDiv = document.getElementById("next-exam");
+      const upcomingDiv = document.getElementById("upcoming");
+      const finishedDiv = document.getElementById("finished");
+      const timestampDiv = document.getElementById("timestamp");
+
+      const upcoming = [];
+      const finished = [];
+
+      exams.forEach(([name, timeStr]) => {
+        const time = new Date(timeStr);
+        if (time > now) upcoming.push([name, time]);
+        else finished.push([name, time]);
+      });
+
+      if (upcoming.length > 0) {
+        const [nextName, nextTime] = upcoming[0];
+        const msLeft = nextTime - now;
+        nextExamDiv.textContent = `🚀 Next Exam: ${nextName} at ${nextTime.toLocaleString()} | ⏳ ${formatTimeLeft(msLeft)} left`;
+      } else {
+        nextExamDiv.textContent = "🎉 All exams completed!";
+      }
+
+      upcomingDiv.innerHTML = "";
+      upcoming.forEach(([name, time]) => {
+        const msLeft = time - now;
+        const daysLeft = msLeft / (1000 * 60 * 60 * 24);
+        const div = document.createElement("div");
+        div.className = `exam ${getColorClass(daysLeft)}`;
+        div.textContent = `${name} - ${time.toLocaleString()} - ${formatTimeLeft(msLeft)} left`;
+        upcomingDiv.appendChild(div);
+      });
+
+      finishedDiv.innerHTML = "";
+      if (finished.length > 0) {
+        finished.forEach(([name, time]) => {
+          const div = document.createElement("div");
+          div.className = "exam finished";
+          div.textContent = `${name} - ${time.toLocaleString()}`;
+          finishedDiv.appendChild(div);
+        });
+      }
+
+      timestampDiv.textContent = "Last updated: " + now.toLocaleTimeString();
+    }
+
+    // Typewriter delay then start loop
+    setTimeout(() => {
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }, 3000); // match the typewriter animation duration
+  </script>
+</body>
+</html>
